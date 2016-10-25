@@ -14,10 +14,9 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" />
 
-    <GridView
-        android:id="@+id/gv_movies"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_movies"
         android:visibility="gone"
-        android:numColumns="3"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
