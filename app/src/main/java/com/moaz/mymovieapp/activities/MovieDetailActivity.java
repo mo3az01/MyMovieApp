@@ -1,12 +1,15 @@
 package com.moaz.mymovieapp.activities;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.moaz.mymovieapp.R;
 import com.moaz.mymovieapp.fragments.MovieDetailFragment;
+import com.moaz.mymovieapp.utils.GlobalValues;
 
 public class MovieDetailActivity extends ActionBarActivity {
 
@@ -15,34 +18,16 @@ public class MovieDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         if (savedInstanceState == null) {
+            MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
+            if (getIntent().hasExtra(GlobalValues.EXTRA_MOVIE)) {
+                movieDetailFragment.setArguments(getIntent().getExtras());
+//                movie = mContext.getIntent().getParcelableExtra(GlobalValues.EXTRA_MOVIE);
+            }
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MovieDetailFragment())
+                    .add(R.id.container, movieDetailFragment)
                     .commit();
         }
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_movie_detail, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
 }

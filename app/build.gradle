@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'android-apt'
+apply plugin: 'realm-android'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -17,10 +18,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', "\"bab007b9a6288af1455b8cee1f4f9d36\""
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.ms-square:expandableTextView:0.1.4'
+
 }

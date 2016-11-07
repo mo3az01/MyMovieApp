@@ -1,41 +1,64 @@
 package com.moaz.mymovieapp.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.moaz.mymovieapp.R;
-import com.moaz.mymovieapp.Utils.GlobalValues;
 import com.moaz.mymovieapp.models.Movie;
+import com.moaz.mymovieapp.utils.GlobalValues;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by xkcl0301 on 6/19/2016.
  */
-public class MoviesAdapter extends BaseAdapter {
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
     List<Movie> mMovies;
     Context mContext;
+    Activity mActivity;
 
     public MoviesAdapter() {
         mMovies = new ArrayList<>();
     }
 
-    public MoviesAdapter(Context context) {
-        mMovies = new ArrayList<>();
-        mContext = context;
-
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.grid_movie_item, null);
+        return new ViewHolder(view);
     }
 
-    public MoviesAdapter(List<Movie> movies, Context context) {
+    @Override
+    public void onBindViewHolder(ViewHolder viewHolder, int i) {
+        viewHolder.tvMovieName.setText(mMovies.get(i).getTitle());
+        Picasso.with(mContext).load(GlobalValues.IMAGE_BASE_URL + mMovies.get(i).getPoster_path()).into(viewHolder.ivMoviePoster);
+    }
+
+    public MoviesAdapter(Activity activity) {
+        mMovies = new ArrayList<>();
+        mActivity = activity;
+        mContext = activity.getApplicationContext();
+    }
+
+    public MoviesAdapter(List<Movie> movies, Activity activity) {
         this.mMovies = movies;
-        mContext = context;
+        mActivity = activity;
+        mContext = activity.getApplicationContext();
+    }
+
+    public void clear() {
+        mMovies.clear();
     }
 
     public void add(Movie movie) {
@@ -46,44 +69,34 @@ public class MoviesAdapter extends BaseAdapter {
         mMovies.addAll(movieList);
     }
 
+    public List<Movie> getMMovies() {
+        return mMovies;
+    }
+
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return mMovies.size();
     }
 
-    @Override
-    public Movie getItem(int i) {
-        return mMovies.get(i);
-    }
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.iv_movie_poster)
+        ImageView ivMoviePoster;
+        @BindView(R.id.tv_movie_poster)
+        TextView tvMovieName;
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @Override
-    public View getView(int i, View convertView, ViewGroup viewGroup) {
-        ViewHolder viewHolder;
-        View view = convertView;
-        if (view == null) {
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.grid_movie_item, null);
-            viewHolder.ivMoviePoster = (ImageView) view.findViewById(R.id.iv_movie_poster);
-            viewHolder.tvMovieName = (TextView) view.findViewById(R.id.tv_movie_poster);
-            view.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) view.getTag();
+        public ViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+            view.setOnClickListener(this);
         }
 
-        viewHolder.tvMovieName.setText(mMovies.get(i).getTitle());
-        Picasso.with(mContext).load(GlobalValues.IMAGE_BASE_URL + mMovies.get(i).getPoster_path()).into(viewHolder.ivMoviePoster);
-
-        return view;
+        @Override
+        public void onClick(View view) {
+            ((MovieSelection) mActivity).onItemSelect(mMovies.get(getAdapterPosition()));
+        }
     }
 
-    public class ViewHolder {
-        public ImageView ivMoviePoster;
-        public TextView tvMovieName;
+    public interface MovieSelection {
+        public abstract void onItemSelect(Movie v);
     }
 }
