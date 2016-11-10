@@ -1,13 +1,19 @@
 package com.moaz.mymovieapp.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -59,15 +65,18 @@ public class MovieDetailFragment extends Fragment {
     ViewPager vpTrailersAndReviews;
     @BindView(R.id.pts_trailers_reviews)
     PagerTitleStrip pagerTitleStrip;
-
+    MenuItem item;
     Movie movie = null;
     Activity mContext;
     private Unbinder unbinder;
     boolean isFav = false;
     TrailersReviewsAdapter trailersReviewsAdapter;
     Realm realm;
+    private ShareActionProvider mShareActionProvider;
+    public static final String AppName = "#MyMovieApp";
 
     public MovieDetailFragment() {
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -94,6 +103,7 @@ public class MovieDetailFragment extends Fragment {
                 RealmMovie rm = realm.where(RealmMovie.class).equalTo("id", movie.getId()).findFirst();
                 trailersReviewsAdapter.setTrailers(rm.getTrailerRealmList());
                 trailersReviewsAdapter.notifyDataSetChanged();
+                initShareMenu();
                 trailersReviewsAdapter.setReviews(rm.getReviewRealmList());
                 trailersReviewsAdapter.notifyDataSetChanged();
             } else {
@@ -161,6 +171,22 @@ public class MovieDetailFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail_fragmet, menu);
+        item = menu.findItem(R.id.menu_item_share);
+    }
+
+    public Intent createShareFirstTrailerIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        Trailer curTrailer = trailersReviewsAdapter.getTrailers().get(0);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, curTrailer.getName() + ": http://www.youtube.com/watch?v=" + curTrailer.getKey() + " -- " + AppName);
+        return shareIntent;
+    }
+
+
     private void updateFav() {
         RealmMovie find = realm.where(RealmMovie.class).equalTo("id", movie.getId()).findFirst();
 
@@ -185,8 +211,11 @@ public class MovieDetailFragment extends Fragment {
                 Log.e("Response", String.valueOf(response.code()));
                 List<Trailer> trailers = response.body().getResults();
                 Log.e(TAG, "Number of trailers received: " + trailers.size());
+
                 trailersReviewsAdapter.setTrailers(trailers);
                 trailersReviewsAdapter.notifyDataSetChanged();
+                initShareMenu();
+
                 // hide the progress dialog and show our grid
 //                pbMovies.setVisibility(View.GONE);
 //                rvMovies.setVisibility(View.VISIBLE);
@@ -203,6 +232,16 @@ public class MovieDetailFragment extends Fragment {
                 Log.e(TAG, t.toString());
             }
         });
+    }
+
+
+    public void initShareMenu() {
+        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        if (mShareActionProvider != null && !trailersReviewsAdapter.getTrailers().isEmpty()) {
+            mShareActionProvider.setShareIntent(createShareFirstTrailerIntent());
+        } else {
+            Log.d("details fragment", "ActionProvider is null");
+        }
     }
 
     public void fetchReviewers() {

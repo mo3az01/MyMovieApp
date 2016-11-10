@@ -16,5 +16,5 @@
     <string name="trailers">Trailers</string>
     <string name="reviews">Reviews</string>
     <string name="no_internet">Please check your connection and try again</string>
-
+    <string name="action_share">Share</string>
 </resources>

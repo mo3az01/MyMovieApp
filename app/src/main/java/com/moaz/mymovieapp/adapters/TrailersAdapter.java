@@ -1,6 +1,8 @@
 package com.moaz.mymovieapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +26,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
     Context mContex;
     LayoutInflater mLayoutInflater;
 
-    public TrailersAdapter(Context mContex,List<Trailer> trailers) {
+    public TrailersAdapter(Context mContex, List<Trailer> trailers) {
         this.trailers = trailers;
         this.mContex = mContex;
         mLayoutInflater = (LayoutInflater) mContex.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -32,7 +34,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
 
     @Override
     public TrailersAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        return new ViewHolder(mLayoutInflater.inflate(R.layout.trailer_item,null));
+        return new ViewHolder(mLayoutInflater.inflate(R.layout.trailer_item, null));
     }
 
     @Override
@@ -57,6 +59,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.ViewHo
 
         @Override
         public void onClick(View view) {
+            mContex.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailers.get(getAdapterPosition()).getKey())));
         }
     }
 
